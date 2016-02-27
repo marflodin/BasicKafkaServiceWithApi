@@ -46,10 +46,6 @@ public class KafkaEventConsumer implements Runnable {
             while (true) {
                 ConsumerRecords<String, String> records = consumer.poll(Long.MAX_VALUE);
                 for (ConsumerRecord<String, String> record : records) {
-                    Map<String, Object> data = new HashMap<>();
-                    data.put("partition", record.partition());
-                    data.put("offset", record.offset());
-                    data.put("value", record.value());
                     try {
                         KafkaEvent event = gson.fromJson(record.value(), KafkaEvent.class);
                         if (event.getIsRemoved()) {
@@ -57,9 +53,7 @@ public class KafkaEventConsumer implements Runnable {
                             eventsHolder.removeStringFromObjectB(event.getObjectB());
                             eventsHolder.removeStringFromObjectC(event.getObjectC());
                         } else {
-                            System.out.println("add object from list: " + event.getObjectA());
                             eventsHolder.addStringToObjectA(event.getObjectA());
-                            System.out.println("l2: " + eventsHolder.getObjectA().size());
                             eventsHolder.addStringToObjectB(event.getObjectB());
                             eventsHolder.addStringToObjectC(event.getObjectC());
                         }
