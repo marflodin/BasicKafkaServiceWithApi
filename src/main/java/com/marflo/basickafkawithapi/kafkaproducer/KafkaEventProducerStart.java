@@ -9,7 +9,7 @@ public class KafkaEventProducerStart {
         KafkaProducer producer = new KafkaProducer();
 
         for (int i = 0; i < numberOfMessages; i++) {
-            KafkaEvent event = new KafkaEvent(false, "AA21"+i, "BB21"+i, "CC21"+i);
+            KafkaEvent event = new KafkaEvent(false, "DAA21"+i, "DBB21"+i, "DCC21"+i);
             producer.sendMessageToTopic("testTopic", event);
         }
     }

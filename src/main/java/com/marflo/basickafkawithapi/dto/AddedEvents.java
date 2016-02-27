@@ -33,8 +33,24 @@ public class AddedEvents {
         return objectA;
     }
 
+    public void addStringToObjectB(String objectBEntry) {
+        objectB.add(objectBEntry);
+    }
+
+    public void removeStringFromObjectB(String objectBEntry) {
+        objectB.remove(objectBEntry);
+    }
+
     public static Set<String> getObjectB() {
         return objectB;
+    }
+
+    public void addStringToObjectC(String objectCEntry) {
+        objectC.add(objectCEntry);
+    }
+
+    public void removeStringFromObjectC(String objectCEntry) {
+        objectC.remove(objectCEntry);
     }
 
     public static Set<String> getObjectC() {

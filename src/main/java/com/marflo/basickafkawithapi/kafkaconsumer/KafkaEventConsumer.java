@@ -7,6 +7,8 @@ import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.common.PartitionInfo;
+import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.errors.WakeupException;
 
 import java.util.*;
@@ -14,12 +16,11 @@ import java.util.*;
 public class KafkaEventConsumer implements Runnable {
 
     private final KafkaConsumer<String, String> consumer;
-    private final List<String> topics;
-    private final int id;
+    private final String topic;
     private Gson gson = new Gson();
     private AddedEvents eventsHolder = AddedEvents.getInstance();
 
-    public KafkaEventConsumer(int id, String groupId, List<String> topics) {
+    public KafkaEventConsumer(int id, String groupId, String topic) {
         Properties props = new Properties();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         props.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
@@ -32,15 +33,17 @@ public class KafkaEventConsumer implements Runnable {
                 "org.apache.kafka.common.serialization.StringDeserializer");
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG,
                 "earliest");
-        this.topics = topics;
-        this.id = id;
+        this.topic = topic;
         this.consumer = new KafkaConsumer<>(props);
     }
 
     @Override
     public void run() {
         try {
-            consumer.subscribe(topics);
+            TopicPartition partition0 = new TopicPartition(topic, 0);
+            consumer.assign(Arrays.asList(partition0));
+            consumer.seekToBeginning(partition0);
+
             while (true) {
                 ConsumerRecords<String, String> records = consumer.poll(Long.MAX_VALUE);
                 for (ConsumerRecord<String, String> record : records) {
@@ -51,13 +54,15 @@ public class KafkaEventConsumer implements Runnable {
                     try {
                         KafkaEvent event = gson.fromJson(record.value(), KafkaEvent.class);
                         if (event.getIsRemoved()) {
-                            System.out.println("remove object from list: " + event.getObjectA());
                             eventsHolder.removeStringFromObjectA(event.getObjectA());
-                            System.out.println("l: " + eventsHolder.getObjectA().size());
+                            eventsHolder.removeStringFromObjectB(event.getObjectB());
+                            eventsHolder.removeStringFromObjectC(event.getObjectC());
                         } else {
                             System.out.println("add object from list: " + event.getObjectA());
                             eventsHolder.addStringToObjectA(event.getObjectA());
                             System.out.println("l2: " + eventsHolder.getObjectA().size());
+                            eventsHolder.addStringToObjectB(event.getObjectB());
+                            eventsHolder.addStringToObjectC(event.getObjectC());
                         }
                     } catch (Exception e) {
                     //TODO: handle exception
