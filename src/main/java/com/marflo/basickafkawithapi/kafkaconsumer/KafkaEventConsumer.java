@@ -20,7 +20,7 @@ public class KafkaEventConsumer implements Runnable {
     private Gson gson = new Gson();
     private AddedEvents eventsHolder = AddedEvents.getInstance();
 
-    public KafkaEventConsumer(int id, String groupId, String topic) {
+    public KafkaEventConsumer(String groupId, String topic) {
         Properties props = new Properties();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         props.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
