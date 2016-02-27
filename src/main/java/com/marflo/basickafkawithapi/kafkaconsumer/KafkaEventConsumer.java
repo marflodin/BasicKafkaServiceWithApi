@@ -30,7 +30,8 @@ public class KafkaEventConsumer implements Runnable {
                 "org.apache.kafka.common.serialization.IntegerDeserializer");
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
                 "org.apache.kafka.common.serialization.StringDeserializer");
-
+        props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG,
+                "earliest");
         this.topics = topics;
         this.id = id;
         this.consumer = new KafkaConsumer<>(props);
@@ -40,7 +41,6 @@ public class KafkaEventConsumer implements Runnable {
     public void run() {
         try {
             consumer.subscribe(topics);
-
             while (true) {
                 ConsumerRecords<String, String> records = consumer.poll(Long.MAX_VALUE);
                 for (ConsumerRecord<String, String> record : records) {
@@ -53,16 +53,15 @@ public class KafkaEventConsumer implements Runnable {
                         if (event.getIsRemoved()) {
                             System.out.println("remove object from list: " + event.getObjectA());
                             eventsHolder.removeStringFromObjectA(event.getObjectA());
-                            System.out.println("length: " + eventsHolder.getObjectA().size());
+                            System.out.println("l: " + eventsHolder.getObjectA().size());
                         } else {
                             System.out.println("add object from list: " + event.getObjectA());
                             eventsHolder.addStringToObjectA(event.getObjectA());
-                            System.out.println("length2: " + eventsHolder.getObjectA().size());
+                            System.out.println("l2: " + eventsHolder.getObjectA().size());
                         }
                     } catch (Exception e) {
                     //TODO: handle exception
                     }
-                    System.out.println(this.id + ": " + data);
                 }
             }
         } catch (WakeupException e) {

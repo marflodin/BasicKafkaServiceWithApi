@@ -9,7 +9,7 @@ public class KafkaEventConsumerStart {
     static List<String> TEST_TOPIC = new ArrayList<String>(){{add("testTopic");}};
 
     public static void main(String[] args) {
-        consumer = new KafkaEventConsumer(1, "group1", TEST_TOPIC);
+        consumer = new KafkaEventConsumer(1, "group1000", TEST_TOPIC);
         consumer.run();
     }
 }
